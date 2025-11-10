@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+
+# Kotlin
+.kotlin/
+*.class
+*.log
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build and temp files
+out/
+bin/
+tmp/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
