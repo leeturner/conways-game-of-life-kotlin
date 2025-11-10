@@ -4,7 +4,6 @@ import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
 import arrow.core.right
-import com.leeturner.cgol.engine.CellState.ALIVE
 import kotlin.random.Random
 
 /**
@@ -20,11 +19,11 @@ import kotlin.random.Random
 @ConsistentCopyVisibility
 data class Universe internal constructor(
     val gridSize: Int = 64,
-    private val cells: Map<Coordinate, CellState> = emptyMap(),
+    private val aliveCells: Set<Coordinate> = emptySet(),
 ) {
-    fun isAlive(coordinate: Coordinate) = cells[coordinate] == ALIVE
+    fun isAlive(coordinate: Coordinate) = coordinate in aliveCells
 
-    fun population() = cells.size
+    fun population() = aliveCells.size
 
     fun tick(): Universe {
         /**
@@ -40,20 +39,17 @@ data class Universe internal constructor(
          * The nice thing about only tracking live cells is that we only need to worry about the rules
          * that produce a live cell
          */
-        val newCells =
+        val newAliveCells =
             allCoordinates
-                .mapNotNull { coordinate ->
+                .filter { coordinate ->
                     val liveNeighbourCount = neighbors(coordinate).count { isAlive(it) }
-                    val isCurrentlyAlive = isAlive(coordinate)
-
                     when {
-                        isCurrentlyAlive && liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX -> coordinate to ALIVE
-                        !isCurrentlyAlive && liveNeighbourCount == BIRTH_COUNT -> coordinate to ALIVE
-                        else -> null
+                        isAlive(coordinate) -> liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX
+                        else -> liveNeighbourCount == BIRTH_COUNT
                     }
-                }.toMap()
+                }.toSet()
 
-        return copy(cells = newCells)
+        return copy(aliveCells = newAliveCells)
     }
 
     private val allCoordinates: Sequence<Coordinate>
@@ -81,8 +77,6 @@ data class Universe internal constructor(
             }
         }
 
-    private fun aliveCells() = cells.keys
-
     override fun toString(): String =
         allCoordinates
             .chunked(gridSize)
@@ -109,7 +103,7 @@ data class Universe internal constructor(
                 ensure(outOfBoundCoordinates.isEmpty()) {
                     UniverseCoordinatesOutOfBoundsError(outOfBoundCoordinates)
                 }
-                return Universe(gridSize, aliveCells.associateWith { ALIVE }).right()
+                return Universe(gridSize, aliveCells).right()
             }
 
         // TODO:  This might add too many alive cells
@@ -133,11 +127,6 @@ data class Coordinate(
     val x: Int,
     val y: Int,
 )
-
-enum class CellState {
-    DEAD,
-    ALIVE,
-}
 
 sealed interface UniverseCreationError
 
