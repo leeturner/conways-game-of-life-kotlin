@@ -23,24 +23,39 @@ data class Universe internal constructor(
 ) {
     fun isAlive(coordinate: Coordinate) = coordinate in aliveCells
 
+    fun isAlive(
+        x: Int,
+        y: Int,
+    ) = Coordinate(x, y) in aliveCells
+
     fun population() = aliveCells.size
 
+    /**
+     * Every cell interacts with its eight neighbours, which are the cells that are
+     * horizontally, vertically, or diagonally adjacent. At each step in time, the
+     * following transitions occur:
+     *
+     * Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+     * Any live cell with more than three live neighbours dies, as if by overpopulation.
+     * Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+     * Any live cell with two or three live neighbours lives on to the next generation.
+     *
+     * Optimized implementation: Instead of checking all gridSize x gridSize cells,
+     * we only check alive cells (for survival) and their neighbors (for potential births).
+     * This is much more efficient for sparse populations.
+     */
     fun tick(): Universe {
-        /**
-         * Every cell interacts with its eight neighbours, which are the cells that are
-         * horizontally, vertically, or diagonally adjacent. At each step in time, the
-         * following transitions occur:
-         *
-         * Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-         * Any live cell with more than three live neighbours dies, as if by overpopulation.
-         * Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-         * Any live cell with two or three live neighbours lives on to the next generation.
-         *
-         * The nice thing about only tracking live cells is that we only need to worry about the rules
-         * that produce a live cell
-         */
+        // Build set of all cells that need checking: alive cells + their neighbors
+        val cellsToCheck =
+            buildSet {
+                aliveCells.forEach { cell ->
+                    add(cell) // Check if alive cell survives
+                    addAll(neighbors(cell)) // Check if dead neighbors are born
+                }
+            }
+
         val newAliveCells =
-            allCoordinates
+            cellsToCheck
                 .filter { coordinate ->
                     val liveNeighbourCount = neighbors(coordinate).count { isAlive(it) }
                     when {
@@ -82,7 +97,7 @@ data class Universe internal constructor(
             .chunked(gridSize)
             .joinToString("\n") { row ->
                 row.joinToString("") { coord ->
-                    if (isAlive(coord)) " #" else " ."
+                    if (isAlive(coord)) " #" else " ·"
                 }
             }
 
@@ -106,7 +121,6 @@ data class Universe internal constructor(
                 return Universe(gridSize, aliveCells).right()
             }
 
-        // TODO:  This might add too many alive cells
         private fun randomAliveCells(gridSize: Int): Set<Coordinate> =
             (0..<gridSize)
                 .asSequence()
