@@ -1,6 +1,7 @@
 package com.leeturner.cgol.engine
 
 import arrow.core.getOrElse
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import strikt.api.expectThat
@@ -23,9 +24,9 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . . .
-           | . # .
-           | . . .
+           | · · ·
+           | · # ·
+           | · · ·
             """.trimMargin(),
         )
 
@@ -55,9 +56,9 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . # #
-           | . # #
-           | . . #
+           | · # #
+           | · # #
+           | · · #
             """.trimMargin(),
         )
 
@@ -86,9 +87,9 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . # #
-           | . . #
-           | . . .
+           | · # #
+           | · · #
+           | · · ·
             """.trimMargin(),
         )
 
@@ -116,9 +117,9 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . # #
-           | . # .
-           | . . .
+           | · # #
+           | · # ·
+           | · · ·
             """.trimMargin(),
         )
 
@@ -147,9 +148,9 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . # #
-           | . # #
-           | . . .
+           | · # #
+           | · # #
+           | · · ·
             """.trimMargin(),
         )
 
@@ -159,17 +160,19 @@ class UniverseRulesTests {
     }
 
     @Test
-    fun `oscillators - blinker`() {
-        // see https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
+    fun `the universe wraps from left to right`() {
+        val coordinateUnderTest = Coordinate(2, 1)
 
         val universe =
             Universe.create(
-                gridSize = 5,
+                gridSize = 3,
                 aliveCells =
                     setOf(
-                        Coordinate(2, 1),
-                        Coordinate(2, 2),
-                        Coordinate(2, 3),
+                        Coordinate(0, 0),
+                        Coordinate(0, 1),
+                        Coordinate(0, 2),
+                        Coordinate(2, 0),
+                        coordinateUnderTest,
                     ),
             )
 
@@ -177,36 +180,333 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | . . . . .
-           | . . # . .
-           | . . # . .
-           | . . # . .
-           | . . . . .
+           | # · #
+           | # · #
+           | # · ·
             """.trimMargin(),
         )
 
         val secondGeneration = initialState.tick()
 
-        expectThat(secondGeneration.toString()).isEqualTo(
+        expectThat(secondGeneration.isAlive(coordinateUnderTest)).isFalse()
+    }
+
+    @Test
+    fun `the universe wraps from top to bottom`() {
+        val coordinateUnderTest = Coordinate(1, 0)
+
+        val universe =
+            Universe.create(
+                gridSize = 3,
+                aliveCells =
+                    setOf(
+                        coordinateUnderTest,
+                        Coordinate(2, 0),
+                        Coordinate(0, 2),
+                        Coordinate(1, 2),
+                        Coordinate(2, 2),
+                    ),
+            )
+
+        val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+        expectThat(initialState.toString()).isEqualTo(
             """
-           | . . . . .
-           | . . . . .
-           | . # # # .
-           | . . . . .
-           | . . . . .
+           | · # #
+           | · · ·
+           | # # #
             """.trimMargin(),
         )
 
-        val thirdGeneration = secondGeneration.tick()
+        val secondGeneration = initialState.tick()
 
-        expectThat(thirdGeneration.toString()).isEqualTo(
-            """
-           | . . . . .
-           | . . # . .
-           | . . # . .
-           | . . # . .
-           | . . . . .
-            """.trimMargin(),
-        )
+        expectThat(secondGeneration.isAlive(coordinateUnderTest)).isFalse()
+    }
+
+    @Nested
+    inner class StillLifeTests {
+        @Test
+        fun `still life - block`() {
+            val universe =
+                Universe.create(
+                    gridSize = 4,
+                    aliveCells =
+                        setOf(
+                            Coordinate(1, 1),
+                            Coordinate(1, 2),
+                            Coordinate(2, 1),
+                            Coordinate(2, 2),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · ·
+           | · # # ·
+           | · # # ·
+           | · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+           | · · · ·
+           | · # # ·
+           | · # # ·
+           | · · · ·
+                """.trimMargin(),
+            )
+        }
+
+        @Test
+        fun `still life - bee-hive`() {
+            val universe =
+                Universe.create(
+                    gridSize = 6,
+                    aliveCells =
+                        setOf(
+                            Coordinate(1, 2),
+                            Coordinate(2, 1),
+                            Coordinate(2, 3),
+                            Coordinate(3, 1),
+                            Coordinate(3, 3),
+                            Coordinate(4, 2),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · · # # · ·
+           | · # · · # ·
+           | · · # # · ·
+           | · · · · · ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · · # # · ·
+           | · # · · # ·
+           | · · # # · ·
+           | · · · · · ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+        }
+
+        @Test
+        fun `still life - tub`() {
+            val universe =
+                Universe.create(
+                    gridSize = 5,
+                    aliveCells =
+                        setOf(
+                            Coordinate(1, 2),
+                            Coordinate(2, 1),
+                            Coordinate(2, 3),
+                            Coordinate(3, 2),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · · ·
+           | · · # · ·
+           | · # · # ·
+           | · · # · ·
+           | · · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+           | · · · · ·
+           | · · # · ·
+           | · # · # ·
+           | · · # · ·
+           | · · · · ·
+                """.trimMargin(),
+            )
+        }
+    }
+
+    @Nested
+    inner class OscillatorsTests {
+        @Test
+        fun `oscillators - blinker`() {
+            val universe =
+                Universe.create(
+                    gridSize = 5,
+                    aliveCells =
+                        setOf(
+                            Coordinate(2, 1),
+                            Coordinate(2, 2),
+                            Coordinate(2, 3),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · · ·
+           | · · # · ·
+           | · · # · ·
+           | · · # · ·
+           | · · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+           | · · · · ·
+           | · · · · ·
+           | · # # # ·
+           | · · · · ·
+           | · · · · ·
+                """.trimMargin(),
+            )
+
+            val thirdGeneration = secondGeneration.tick()
+
+            expectThat(thirdGeneration.toString()).isEqualTo(
+                """
+           | · · · · ·
+           | · · # · ·
+           | · · # · ·
+           | · · # · ·
+           | · · · · ·
+                """.trimMargin(),
+            )
+        }
+
+        @Test
+        fun `oscillators - toad`() {
+            val universe =
+                Universe.create(
+                    gridSize = 6,
+                    aliveCells =
+                        setOf(
+                            Coordinate(1, 3),
+                            Coordinate(2, 2),
+                            Coordinate(2, 3),
+                            Coordinate(3, 2),
+                            Coordinate(3, 3),
+                            Coordinate(4, 2),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · · · · · ·
+           | · · # # # ·
+           | · # # # · ·
+           | · · · · · ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+          | · · · · · ·
+          | · · · # · ·
+          | · # · · # ·
+          | · # · · # ·
+          | · · # · · ·
+          | · · · · · ·
+                """.trimMargin(),
+            )
+
+            val thirdGeneration = secondGeneration.tick()
+
+            expectThat(thirdGeneration.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · · · · · ·
+           | · · # # # ·
+           | · # # # · ·
+           | · · · · · ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+        }
+
+        @Test
+        fun `oscillators - beacon`() {
+            val universe =
+                Universe.create(
+                    gridSize = 6,
+                    aliveCells =
+                        setOf(
+                            Coordinate(1, 1),
+                            Coordinate(1, 2),
+                            Coordinate(2, 1),
+                            Coordinate(3, 4),
+                            Coordinate(4, 3),
+                            Coordinate(4, 4),
+                        ),
+                )
+
+            val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+            expectThat(initialState.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · # # · · ·
+           | · # · · · ·
+           | · · · · # ·
+           | · · · # # ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+
+            val secondGeneration = initialState.tick()
+
+            expectThat(secondGeneration.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · # # · · ·
+           | · # # · · ·
+           | · · · # # ·
+           | · · · # # ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+
+            val thirdGeneration = secondGeneration.tick()
+
+            expectThat(thirdGeneration.toString()).isEqualTo(
+                """
+           | · · · · · ·
+           | · # # · · ·
+           | · # · · · ·
+           | · · · · # ·
+           | · · · # # ·
+           | · · · · · ·
+                """.trimMargin(),
+            )
+        }
     }
 }
