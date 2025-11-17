@@ -12,16 +12,17 @@ import java.io.PrintStream
 
 class GameOfLifeCommandTest {
     @Test
-    fun testWithCommandLineOption() {
+    fun `the grid size parameter is passed into universe creation to return an error`() {
         ApplicationContext.run(Environment.CLI, Environment.TEST).use { ctx ->
             ByteArrayOutputStream().use { baos ->
                 System.setOut(PrintStream(baos))
 
-                val args = arrayOf("-v")
+                val args = arrayOf("-g", "2")
                 val exitCode = PicocliRunner.call(GameOfLifeCommand::class.java, ctx, *args)
 
-                expectThat(exitCode).isEqualTo(0)
-                expectThat(baos.toString()).contains("Hi!")
+                expectThat(exitCode).isEqualTo(1)
+                expectThat(baos.toString()).contains("Error creating universe:")
+                expectThat(baos.toString()).contains("The minimum grid size is 3")
             }
         }
     }
