@@ -1,4 +1,4 @@
 
 
-rootProject.name="GameOfLife"
+rootProject.name="golk"
 
