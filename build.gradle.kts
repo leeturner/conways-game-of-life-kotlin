@@ -64,7 +64,7 @@ micronaut {
 }
 
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
-    jdkVersion = "25"
+    jdkVersion = "21"
 }
 
 
