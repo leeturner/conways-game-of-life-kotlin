@@ -82,12 +82,16 @@ data class Universe internal constructor(
         listOf(-1, 0, 1).flatMap { dx ->
             listOf(-1, 0, 1).mapNotNull { dy ->
                 when {
-                    dx == 0 && dy == 0 -> null
-                    else ->
+                    dx == 0 && dy == 0 -> {
+                        null
+                    }
+
+                    else -> {
                         Coordinate(
                             (coordinate.x + dx + gridSize) % gridSize,
                             (coordinate.y + dy + gridSize) % gridSize,
                         )
+                    }
                 }
             }
         }

@@ -34,12 +34,19 @@ class GameOfLifeCommand(
             ifLeft = { error ->
                 println("Error creating universe:")
                 when (error) {
-                    is UniverseCoordinatesOutOfBoundsError ->
+                    is UniverseCoordinatesOutOfBoundsError -> {
                         println(
                             "The following coordinates are out of bounds: ${error.outOfBoundsCoordinates}",
                         )
-                    is UniverseMinimumSizeError -> println("The minimum grid size is ${error.minimumGridSize}")
-                    is UniverseNoAliveCells -> println("There are no alive cells in the initial state")
+                    }
+
+                    is UniverseMinimumSizeError -> {
+                        println("The minimum grid size is ${error.minimumGridSize}")
+                    }
+
+                    is UniverseNoAliveCells -> {
+                        println("There are no alive cells in the initial state")
+                    }
                 }
                 return 1 // error
             },
