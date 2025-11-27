@@ -27,6 +27,10 @@ Conway's Game of Life follows four simple rules:
 3. **Overpopulation**: Any live cell with more than three live neighbours dies
 4. **Reproduction**: Any dead cell with exactly three live neighbours becomes a live cell
 
+## Screenshots
+
+![Animated GIF of GOL](/docs/cgolk.gif "Animated Terminal GOL")
+
 ## Technology Stack
 
 - **Language**: Kotlin with JVM 21
