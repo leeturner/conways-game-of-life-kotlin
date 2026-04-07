@@ -15,7 +15,7 @@ shadow = "9.4.0"
 
 # Libraries
 strikt = "0.35.1"
-arrow = "2.2.2"
+arrow = "2.2.2.1"
 
 [libraries]
 
