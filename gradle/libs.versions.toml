@@ -6,7 +6,7 @@ kapt = "2.3.21"
 
 # Micronaut
 micronaut-version = "4.10.0"
-micronaut-application = "4.6.2"
+micronaut-application = "5.0.0"
 
 # Plugins
 kotlinter = "5.4.2"
