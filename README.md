@@ -33,7 +33,7 @@ Conway's Game of Life follows four simple rules:
 
 ## Technology Stack
 
-- **Language**: Kotlin with JVM 21
+- **Language**: Kotlin with JVM 25
 - **Framework**: Micronaut (for dependency injection and CLI)
 - **CLI**: Picocli (command-line interface)
 - **Functional Programming**: Arrow Core (for Either, functional error handling)
@@ -43,7 +43,7 @@ Conway's Game of Life follows four simple rules:
 
 ## Requirements
 
-- Java 21 or higher
+- Java 25 or higher
 - Gradle (wrapper included)
 
 ## Building
