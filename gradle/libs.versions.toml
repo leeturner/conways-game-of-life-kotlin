@@ -5,8 +5,8 @@ kotlin = "2.4.0"
 kapt = "2.4.0"
 
 # Micronaut
-micronaut-version = "4.10.0"
-micronaut-application = "4.6.2"
+micronaut-version = "5.1.0"
+micronaut-application = "5.0.2"
 
 # Plugins
 kotlinter = "5.5.0"
