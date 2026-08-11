@@ -10,7 +10,7 @@ micronaut-application = "4.6.2"
 
 # Plugins
 kotlinter = "5.5.0"
-detekt = "1.23.8"
+detekt = "2.0.0-alpha.6"
 shadow = "9.4.3"
 
 # Libraries
@@ -50,5 +50,5 @@ kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "ko
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
 micronaut-application = { id = "io.micronaut.application", version.ref = "micronaut-application" }
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
 kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter" }

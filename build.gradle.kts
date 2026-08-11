@@ -39,12 +39,12 @@ application {
 }
 
 java {
-    sourceCompatibility = JavaVersion.toVersion("21")
+    sourceCompatibility = JavaVersion.toVersion("25")
 }
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
 }
 
@@ -63,8 +63,12 @@ micronaut {
     }
 }
 
+tasks.named<io.micronaut.gradle.docker.MicronautDockerfile>("dockerfile") {
+  baseImage = "eclipse-temurin:25-jre"
+}
+
 tasks.named<io.micronaut.gradle.docker.NativeImageDockerfile>("dockerfileNative") {
-    jdkVersion = "21"
+    jdkVersion = "25"
 }
 
 
