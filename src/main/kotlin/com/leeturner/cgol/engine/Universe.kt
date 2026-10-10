@@ -3,7 +3,6 @@ package com.leeturner.cgol.engine
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import arrow.core.right
 import kotlin.random.Random
 
 /**
@@ -114,7 +113,7 @@ data class Universe internal constructor(
                 ensure(outOfBoundCoordinates.isEmpty()) {
                     UniverseCoordinatesOutOfBoundsError(outOfBoundCoordinates)
                 }
-                return Universe(gridSize, aliveCells).right()
+                Universe(gridSize, aliveCells)
             }
 
         /**
