@@ -105,6 +105,9 @@ data class Universe internal constructor(
                 ensure(gridSize >= MINIMUM_GRID_SIZE) {
                     UniverseMinimumSizeError(MINIMUM_GRID_SIZE)
                 }
+                ensure(gridSize <= MAXIMUM_GRID_SIZE) {
+                    UniverseMaximumSizeError(MAXIMUM_GRID_SIZE)
+                }
                 ensure(aliveCells.isNotEmpty()) { UniverseNoAliveCells }
                 val outOfBoundCoordinates =
                     aliveCells.filterNot {
@@ -118,11 +121,12 @@ data class Universe internal constructor(
 
         /**
          * Regenerates until at least one cell is alive, so small grids don't fail at random.
-         * A grid with no cells (gridSize < 1) can never succeed, so it is returned empty
-         * for create() to reject instead of looping forever.
+         * This runs before create() checks the size, so sizes it will reject get no cells:
+         * otherwise a size below 1 would loop forever and a huge size would run out of memory.
          */
-        private fun randomAliveCells(gridSize: Int): Set<Coordinate> =
-            generateSequence {
+        private fun randomAliveCells(gridSize: Int): Set<Coordinate> {
+            if (gridSize !in MINIMUM_GRID_SIZE..MAXIMUM_GRID_SIZE) return emptySet()
+            return generateSequence {
                 (0..<gridSize)
                     .asSequence()
                     .flatMap { x ->
@@ -130,10 +134,12 @@ data class Universe internal constructor(
                             Coordinate(x, y).takeIf { Random.nextBoolean() }
                         }
                     }.toSet()
-            }.first { it.isNotEmpty() || gridSize < 1 }
+            }.first { it.isNotEmpty() }
+        }
 
         const val DEFAULT_GRID_SIZE = 64
         private const val MINIMUM_GRID_SIZE = 3
+        private const val MAXIMUM_GRID_SIZE = 256 // Each cell is 2 characters wide, so 512 terminal columns
         private const val SURVIVAL_MIN = 2 // Minimum neighbors for survival
         private const val SURVIVAL_MAX = 3 // Maximum neighbors for survival
         private const val BIRTH_COUNT = 3 // Neighbors needed for birth
@@ -149,6 +155,10 @@ sealed interface UniverseCreationError
 
 data class UniverseMinimumSizeError(
     val minimumGridSize: Int,
+) : UniverseCreationError
+
+data class UniverseMaximumSizeError(
+    val maximumGridSize: Int,
 ) : UniverseCreationError
 
 data class UniverseCoordinatesOutOfBoundsError(

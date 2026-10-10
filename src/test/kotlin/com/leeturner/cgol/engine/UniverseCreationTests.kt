@@ -35,6 +35,29 @@ class UniverseCreationTests {
     }
 
     @Test
+    @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    fun `cannot create a universe with a size greater than 256`() {
+        expectThat(Universe.create(gridSize = 257))
+            .isLeft()
+            .value
+            .isA<UniverseMaximumSizeError>()
+            .get { maximumGridSize }
+            .isEqualTo(256)
+
+        // Without a limit, building the random start for this size would run out of memory
+        expectThat(Universe.create(gridSize = 100_000)).isLeft().value.isA<UniverseMaximumSizeError>()
+    }
+
+    @Test
+    fun `can create a random universe of the maximum size`() {
+        expectThat(Universe.create(gridSize = 256))
+            .isRight()
+            .value
+            .get { gridSize }
+            .isEqualTo(256)
+    }
+
+    @Test
     fun `a random universe always has at least one alive cell`() {
         // An empty 3x3 start used to happen 1 in 512 times, so 5,000 attempts would almost certainly hit one
         repeat(5_000) {

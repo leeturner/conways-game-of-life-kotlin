@@ -92,7 +92,7 @@ Or with options:
 
 ### Command-Line Options
 
-- `-g, --grid-size <size>`: Set the grid size (default: 64)
+- `-g, --grid-size <size>`: Set the grid size, from 3 to 256 (default: 64)
 - `-h, --help`: Show help message and exit
 
 ## Project Structure

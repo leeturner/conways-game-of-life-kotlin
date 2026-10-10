@@ -2,6 +2,7 @@ package com.leeturner.cgol
 
 import com.leeturner.cgol.engine.Universe
 import com.leeturner.cgol.engine.UniverseCoordinatesOutOfBoundsError
+import com.leeturner.cgol.engine.UniverseMaximumSizeError
 import com.leeturner.cgol.engine.UniverseMinimumSizeError
 import com.leeturner.cgol.engine.UniverseNoAliveCells
 import com.leeturner.cgol.ui.UniverseRenderer
@@ -40,6 +41,10 @@ class GameOfLifeCommand(
 
                     is UniverseMinimumSizeError -> {
                         println("The minimum grid size is ${error.minimumGridSize}")
+                    }
+
+                    is UniverseMaximumSizeError -> {
+                        println("The maximum grid size is ${error.maximumGridSize}")
                     }
 
                     is UniverseNoAliveCells -> {
