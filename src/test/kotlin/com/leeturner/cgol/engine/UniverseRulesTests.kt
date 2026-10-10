@@ -161,18 +161,14 @@ class UniverseRulesTests {
 
     @Test
     fun `the universe wraps from left to right`() {
-        val coordinateUnderTest = Coordinate(2, 1)
-
         val universe =
             Universe.create(
-                gridSize = 3,
+                gridSize = 5,
                 aliveCells =
                     setOf(
-                        Coordinate(0, 0),
                         Coordinate(0, 1),
                         Coordinate(0, 2),
-                        Coordinate(2, 0),
-                        coordinateUnderTest,
+                        Coordinate(0, 3),
                     ),
             )
 
@@ -180,31 +176,37 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | # · #
-           | # · #
-           | # · ·
+           | · · · · ·
+           | # · · · ·
+           | # · · · ·
+           | # · · · ·
+           | · · · · ·
             """.trimMargin(),
         )
 
         val secondGeneration = initialState.tick()
 
-        expectThat(secondGeneration.isAlive(coordinateUnderTest)).isFalse()
+        expectThat(secondGeneration.toString()).isEqualTo(
+            """
+           | · · · · ·
+           | · · · · ·
+           | # # · · #
+           | · · · · ·
+           | · · · · ·
+            """.trimMargin(),
+        )
     }
 
     @Test
     fun `the universe wraps from top to bottom`() {
-        val coordinateUnderTest = Coordinate(1, 0)
-
         val universe =
             Universe.create(
-                gridSize = 3,
+                gridSize = 5,
                 aliveCells =
                     setOf(
-                        coordinateUnderTest,
+                        Coordinate(1, 0),
                         Coordinate(2, 0),
-                        Coordinate(0, 2),
-                        Coordinate(1, 2),
-                        Coordinate(2, 2),
+                        Coordinate(3, 0),
                     ),
             )
 
@@ -212,15 +214,63 @@ class UniverseRulesTests {
 
         expectThat(initialState.toString()).isEqualTo(
             """
-           | · # #
-           | · · ·
-           | # # #
+           | · # # # ·
+           | · · · · ·
+           | · · · · ·
+           | · · · · ·
+           | · · · · ·
             """.trimMargin(),
         )
 
         val secondGeneration = initialState.tick()
 
-        expectThat(secondGeneration.isAlive(coordinateUnderTest)).isFalse()
+        expectThat(secondGeneration.toString()).isEqualTo(
+            """
+           | · · # · ·
+           | · · # · ·
+           | · · · · ·
+           | · · · · ·
+           | · · # · ·
+            """.trimMargin(),
+        )
+    }
+
+    @Test
+    fun `the universe wraps around the corners`() {
+        val universe =
+            Universe.create(
+                gridSize = 5,
+                aliveCells =
+                    setOf(
+                        Coordinate(0, 4),
+                        Coordinate(0, 0),
+                        Coordinate(0, 1),
+                    ),
+            )
+
+        val initialState = universe.getOrElse { fail("Expected valid initial state") }
+
+        expectThat(initialState.toString()).isEqualTo(
+            """
+           | # · · · ·
+           | # · · · ·
+           | · · · · ·
+           | · · · · ·
+           | # · · · ·
+            """.trimMargin(),
+        )
+
+        val secondGeneration = initialState.tick()
+
+        expectThat(secondGeneration.toString()).isEqualTo(
+            """
+           | # # · · #
+           | · · · · ·
+           | · · · · ·
+           | · · · · ·
+           | · · · · ·
+            """.trimMargin(),
+        )
     }
 
     @Nested
