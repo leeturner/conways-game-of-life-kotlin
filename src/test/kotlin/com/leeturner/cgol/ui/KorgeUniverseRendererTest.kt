@@ -7,7 +7,11 @@ import korlibs.image.bitmap.Bitmap32
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import strikt.api.expectThat
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
+import java.awt.HeadlessException
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 
 class KorgeUniverseRendererTest {
     private fun universe(vararg alive: Coordinate) =
@@ -38,5 +42,27 @@ class KorgeUniverseRendererTest {
 
         expectThat(bitmap[1, 1]).isEqualTo(DEAD_CELL_COLOR)
         expectThat(bitmap[0, 0]).isEqualTo(ALIVE_CELL_COLOR)
+    }
+
+    @Test
+    fun `a window that fails to open gives an error exit code and says why`() {
+        ByteArrayOutputStream().use { baos ->
+            val originalErr = System.err
+            System.setErr(PrintStream(baos))
+            val exitCode =
+                try {
+                    windowExitCode { throw HeadlessException() }
+                } finally {
+                    System.setErr(originalErr)
+                }
+
+            expectThat(exitCode).isEqualTo(1)
+            expectThat(baos.toString()).contains("Could not open the KorGE window")
+        }
+    }
+
+    @Test
+    fun `a window that closes normally gives a success exit code`() {
+        expectThat(windowExitCode {}).isEqualTo(0)
     }
 }

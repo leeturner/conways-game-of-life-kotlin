@@ -41,23 +41,25 @@ class KorgeUniverseRenderer : UniverseRenderer {
 
     private fun startWindow(gridSize: Int) {
         thread(isDaemon = true, name = "korge") {
-            runBlocking {
-                Korge(windowSize = Size(WINDOW_SIZE, WINDOW_SIZE + HEADER_HEIGHT), title = "golk") {
-                    val bitmap = Bitmap32(gridSize, gridSize)
-                    val header = text("", color = Colors.WHITE)
-                    image(bitmap) {
-                        smoothing = false
-                        size(WINDOW_SIZE, WINDOW_SIZE)
-                        y = HEADER_HEIGHT.toDouble()
-                    }
-                    addUpdater {
-                        val frame = latest ?: return@addUpdater
-                        header.text = "Generation: ${frame.generation} | Population: ${frame.universe.population()}"
-                        bitmap.lock { fillBitmap(frame.universe, bitmap) }
-                    }
-                }
+            // KorGE already exits when its window closes; this also ends the simulation if the window never opens
+            exitProcess(windowExitCode { runBlocking { openWindow(gridSize) } })
+        }
+    }
+
+    private suspend fun openWindow(gridSize: Int) {
+        Korge(windowSize = Size(WINDOW_SIZE, WINDOW_SIZE + HEADER_HEIGHT), title = "golk") {
+            val bitmap = Bitmap32(gridSize, gridSize)
+            val header = text("", color = Colors.WHITE)
+            image(bitmap) {
+                smoothing = false
+                size(WINDOW_SIZE, WINDOW_SIZE)
+                y = HEADER_HEIGHT.toDouble()
             }
-            exitProcess(0) // KorGE already exits when its window closes; this covers any other way its loop ends
+            addUpdater {
+                val frame = latest ?: return@addUpdater
+                header.text = "Generation: ${frame.generation} | Population: ${frame.universe.population()}"
+                bitmap.lock { fillBitmap(frame.universe, bitmap) }
+            }
         }
     }
 
@@ -78,3 +80,13 @@ internal fun fillBitmap(
 ) {
     bitmap.setEach { x, y -> if (universe.isAlive(x, y)) ALIVE_CELL_COLOR else DEAD_CELL_COLOR }
 }
+
+/** Runs the window and turns how it ended into an exit code, so a window that can't open isn't silent. */
+internal fun windowExitCode(window: () -> Unit): Int =
+    runCatching(window).fold(
+        onSuccess = { 0 },
+        onFailure = {
+            System.err.println("Could not open the KorGE window: $it")
+            1
+        },
+    )
