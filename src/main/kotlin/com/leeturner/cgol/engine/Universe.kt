@@ -41,31 +41,23 @@ data class Universe internal constructor(
      * Any live cell with two or three live neighbours lives on to the next generation.
      *
      * Optimized implementation: Instead of checking all gridSize x gridSize cells,
-     * we only check alive cells (for survival) and their neighbors (for potential births).
-     * This is much more efficient for sparse populations.
+     * each alive cell adds one to the count of each of its neighbours. Only cells with
+     * at least one live neighbour get a count, so they are the only ones that can be
+     * alive next generation. This is much more efficient for sparse populations.
      */
-    fun tick(): Universe {
-        // Build set of all cells that need checking: alive cells + their neighbors
-        val cellsToCheck =
-            buildSet {
-                aliveCells.forEach { cell ->
-                    add(cell) // Check if alive cell survives
-                    addAll(neighbors(cell)) // Check if dead neighbors are born
-                }
-            }
-
-        val newAliveCells =
-            cellsToCheck
-                .filter { coordinate ->
-                    val liveNeighbourCount = neighbors(coordinate).count { isAlive(it) }
-                    when {
-                        isAlive(coordinate) -> liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX
-                        else -> liveNeighbourCount == BIRTH_COUNT
-                    }
-                }.toSet()
-
-        return copy(aliveCells = newAliveCells)
-    }
+    fun tick(): Universe =
+        copy(
+            aliveCells =
+                aliveCells
+                    .flatMap(::neighbors)
+                    .groupingBy { it }
+                    .eachCount()
+                    .filter { (cell, liveNeighbourCount) ->
+                        // Three live neighbours means alive next generation, whether by birth or survival
+                        liveNeighbourCount == BIRTH_COUNT ||
+                            (isAlive(cell) && liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX)
+                    }.keys,
+        )
 
     private val allCoordinates: Sequence<Coordinate>
         get() =
