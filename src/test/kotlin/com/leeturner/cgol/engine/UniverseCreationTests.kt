@@ -93,7 +93,6 @@ class UniverseCreationTests {
             .value
             .get { population() }
             .isGreaterThan(0)
-        println(universe.toString())
     }
 
     @Test
