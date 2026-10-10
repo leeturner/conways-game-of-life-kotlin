@@ -14,6 +14,7 @@ create complex and fascinating patterns.
 - **Toroidal Universe**: The grid wraps around like a torus - cells at edges interact with cells on opposite edges
 - **Optimized Algorithm**: Only checks alive cells and their neighbors instead of the entire grid for better performance
 - **Terminal Rendering**: Real-time visualization in your terminal with ANSI color support
+- **KorGE Window Rendering**: Optionally draw the universe in a [KorGE](https://korge.org/) 2D window with `--renderer korge`
 - **Configurable Grid Size**: Customize the universe dimensions with command-line options
 - **Random Initial State**: Generates random starting configurations for exploration
 - **Functional Error Handling**: Uses Arrow's `Either` type for robust error handling
@@ -76,6 +77,12 @@ Run with custom grid size:
 ./gradlew run --args="--grid-size 32"
 ```
 
+Run in a KorGE 2D window instead of the terminal:
+
+```bash
+./gradlew run --args="--renderer korge"
+```
+
 ### Using the Distribution
 
 After building, you can run the standalone application:
@@ -93,6 +100,7 @@ Or with options:
 ### Command-Line Options
 
 - `-g, --grid-size <size>`: Set the grid size, from 3 to 256 (default: 64)
+- `-r, --renderer <terminal|korge>`: Draw in the terminal or a KorGE window (default: terminal)
 - `-h, --help`: Show help message and exit
 
 ## Project Structure
