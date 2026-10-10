@@ -8,6 +8,7 @@ import com.leeturner.cgol.engine.UniverseNoAliveCells
 import com.leeturner.cgol.ui.UniverseRenderer
 import io.micronaut.configuration.picocli.PicocliRunner
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 import java.util.concurrent.Callable
@@ -19,13 +20,27 @@ import kotlin.system.exitProcess
     mixinStandardHelpOptions = true,
 )
 class GameOfLifeCommand(
-    @Inject private val universeRenderer: UniverseRenderer,
+    @Inject @param:Named("terminal") private val terminalRenderer: UniverseRenderer,
+    @param:Named("korge") private val korgeRenderer: UniverseRenderer,
 ) : Callable<Int> {
     @Option(
         names = ["-g", "--grid-size"],
         description = ["The size of the grid (default: ${Universe.DEFAULT_GRID_SIZE}x${Universe.DEFAULT_GRID_SIZE})"],
     )
     private var gridSize: Int = Universe.DEFAULT_GRID_SIZE
+
+    @Option(
+        names = ["-r", "--renderer"],
+        paramLabel = "<renderer>",
+        description = ["Where to draw the universe: \${COMPLETION-CANDIDATES} (default: \${DEFAULT-VALUE})"],
+    )
+    private var rendererType: RendererType = RendererType.terminal
+
+    internal fun selectedRenderer(): UniverseRenderer =
+        when (rendererType) {
+            RendererType.terminal -> terminalRenderer
+            RendererType.korge -> korgeRenderer
+        }
 
     override fun call(): Int {
         val universe = Universe.create(gridSize = gridSize)
@@ -54,18 +69,21 @@ class GameOfLifeCommand(
                 return 1 // error
             },
             ifRight = {
-                runSimulation(it)
+                runSimulation(it, selectedRenderer())
             },
         )
 
         return 0 // success
     }
 
-    fun runSimulation(initialUniverse: Universe) {
+    fun runSimulation(
+        initialUniverse: Universe,
+        renderer: UniverseRenderer,
+    ) {
         generateSequence(initialUniverse to 0) { (universe, generation) ->
             universe.tick() to generation + 1
         }.forEach { (universe, generation) ->
-            universeRenderer.render(universe, generation)
+            renderer.render(universe, generation)
             if (universe.population() == 0) {
                 println("All cells died at generation $generation")
                 return
@@ -83,3 +101,7 @@ class GameOfLifeCommand(
         }
     }
 }
+
+// Lowercase so `-r korge` works: picocli matches enum values case-sensitively
+@Suppress("EnumNaming", "ktlint:standard:enum-entry-name-case")
+enum class RendererType { terminal, korge }

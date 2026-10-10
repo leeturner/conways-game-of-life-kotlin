@@ -2,9 +2,11 @@ package com.leeturner.cgol.ui
 
 import com.leeturner.cgol.engine.Universe
 import io.micronaut.context.annotation.Property
+import jakarta.inject.Named
 import jakarta.inject.Singleton
 
 @Singleton
+@Named("terminal")
 class SimpleTerminalUniverseRenderer(
     @param:Property(name = "universe.renderer.alive-cell-color") private val aliveCellColor: String,
     @param:Property(name = "universe.renderer.dead-cell-color") private val deadCellColor: String,
