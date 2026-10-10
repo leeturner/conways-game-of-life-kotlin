@@ -125,14 +125,21 @@ data class Universe internal constructor(
                 return Universe(gridSize, aliveCells).right()
             }
 
+        /**
+         * Regenerates until at least one cell is alive, so small grids don't fail at random.
+         * A grid with no cells (gridSize < 1) can never succeed, so it is returned empty
+         * for create() to reject instead of looping forever.
+         */
         private fun randomAliveCells(gridSize: Int): Set<Coordinate> =
-            (0..<gridSize)
-                .asSequence()
-                .flatMap { x ->
-                    (0..<gridSize).mapNotNull { y ->
-                        Coordinate(x, y).takeIf { Random.nextBoolean() }
-                    }
-                }.toSet()
+            generateSequence {
+                (0..<gridSize)
+                    .asSequence()
+                    .flatMap { x ->
+                        (0..<gridSize).mapNotNull { y ->
+                            Coordinate(x, y).takeIf { Random.nextBoolean() }
+                        }
+                    }.toSet()
+            }.first { it.isNotEmpty() || gridSize < 1 }
 
         private const val MINIMUM_GRID_SIZE = 3
         private const val SURVIVAL_MIN = 2 // Minimum neighbors for survival

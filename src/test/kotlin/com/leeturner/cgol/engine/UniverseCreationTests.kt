@@ -1,6 +1,7 @@
 package com.leeturner.cgol.engine
 
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.fail
 import strikt.api.expectThat
 import strikt.assertions.containsExactly
@@ -24,6 +25,25 @@ class UniverseCreationTests {
             },
             ifRight = { fail("Expected Left but got Right: $it") },
         )
+    }
+
+    @Test
+    @Timeout(value = 5, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    fun `cannot create a random universe with a size of 0`() {
+        val universe = Universe.create(gridSize = 0)
+
+        universe.fold(
+            ifLeft = { error -> expectThat(error).isA<UniverseMinimumSizeError>() },
+            ifRight = { fail("Expected Left but got Right: $it") },
+        )
+    }
+
+    @Test
+    fun `a random universe always has at least one alive cell`() {
+        // An empty 3x3 start used to happen 1 in 512 times, so 5,000 attempts would almost certainly hit one
+        repeat(5_000) {
+            expectThat(Universe.create(gridSize = 3).isRight()).isTrue()
+        }
     }
 
     @Test
