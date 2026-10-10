@@ -32,6 +32,8 @@ Conway's Game of Life follows four simple rules:
 
 ![Animated GIF of GOL](/docs/cgolk.gif "Animated Terminal GOL")
 
+![Screenshot of the KorGE window](/docs/korge.png "KorGE Window GOL")
+
 ## Technology Stack
 
 - **Language**: Kotlin with JVM 25
