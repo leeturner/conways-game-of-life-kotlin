@@ -10,8 +10,8 @@ import kotlin.random.Random
  *
  * The universe of the Game of Life is an infinite, two-dimensional orthogonal grid
  * of square cells, each of which is in one of two possible states, live or dead (or
- * populated and unpopulated, respectively) in this case we will use a map to hold
- * the cells in our universe.  This allows us to quickly look up a cell based on its
+ * populated and unpopulated, respectively) in this case we will use a set to hold
+ * the alive cells in our universe.  This allows us to quickly look up a cell based on its
  * x and y coordinates and hopefully allows us to be a little more efficient by not
  * having to store state for every cell.
  */
