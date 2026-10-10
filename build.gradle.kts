@@ -22,6 +22,7 @@ dependencies {
   implementation(libs.micronaut.kotlin.runtime)
   implementation(libs.micronaut.picocli)
   implementation(libs.arrow.core)
+  implementation(libs.korge)
 
   runtimeOnly(libs.logback.classic)
 
@@ -31,6 +32,18 @@ dependencies {
 
 application {
     mainClass = "com.leeturner.cgol.GameOfLifeCommand"
+    // KorGE's AWT/OpenGL window reflects into JDK internals and loads native code.
+    // Same package list as KorGE's jvmAddOpensList(); the platform packages only exist on their own OS.
+    val os = System.getProperty("os.name").lowercase()
+    val platformPackages =
+        when {
+            "mac" in os -> listOf("sun.lwawt", "sun.lwawt.macosx", "com.apple.eawt", "com.apple.eawt.event")
+            "linux" in os -> listOf("sun.awt.X11")
+            else -> emptyList()
+        }
+    applicationDefaultJvmArgs =
+        (listOf("sun.java2d.opengl", "java.awt", "sun.awt") + platformPackages)
+            .map { "--add-opens=java.desktop/$it=ALL-UNNAMED" } + "--enable-native-access=ALL-UNNAMED"
 }
 
 java {

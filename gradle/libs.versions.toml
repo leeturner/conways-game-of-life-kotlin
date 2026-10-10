@@ -16,6 +16,7 @@ shadow = "9.6.1"
 # Libraries
 strikt = "0.35.1"
 arrow = "2.2.3"
+korge = "6.0.0"
 
 [libraries]
 
@@ -32,6 +33,9 @@ picocli-codegen = { module = "info.picocli:picocli-codegen" }
 
 # Arrow
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+
+# KorGE
+korge = { module = "com.soywiz.korge:korge-jvm", version.ref = "korge" }
 
 # Testing
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }
