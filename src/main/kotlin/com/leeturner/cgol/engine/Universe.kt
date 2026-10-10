@@ -17,8 +17,8 @@ import kotlin.random.Random
  */
 @ConsistentCopyVisibility
 data class Universe internal constructor(
-    val gridSize: Int = 64,
-    private val aliveCells: Set<Coordinate> = emptySet(),
+    val gridSize: Int,
+    private val aliveCells: Set<Coordinate>,
 ) {
     fun isAlive(coordinate: Coordinate) = coordinate in aliveCells
 
@@ -98,7 +98,7 @@ data class Universe internal constructor(
 
     companion object {
         fun create(
-            gridSize: Int = 64,
+            gridSize: Int = DEFAULT_GRID_SIZE,
             aliveCells: Set<Coordinate> = randomAliveCells(gridSize),
         ): Either<UniverseCreationError, Universe> =
             either {
@@ -132,6 +132,7 @@ data class Universe internal constructor(
                     }.toSet()
             }.first { it.isNotEmpty() || gridSize < 1 }
 
+        const val DEFAULT_GRID_SIZE = 64
         private const val MINIMUM_GRID_SIZE = 3
         private const val SURVIVAL_MIN = 2 // Minimum neighbors for survival
         private const val SURVIVAL_MAX = 3 // Maximum neighbors for survival

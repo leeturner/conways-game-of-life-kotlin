@@ -22,9 +22,9 @@ class GameOfLifeCommand(
 ) : Callable<Int> {
     @Option(
         names = ["-g", "--grid-size"],
-        description = ["The size of the grid (default: ${DEFAULT_GRID_SIZE}x${ DEFAULT_GRID_SIZE })"],
+        description = ["The size of the grid (default: ${Universe.DEFAULT_GRID_SIZE}x${Universe.DEFAULT_GRID_SIZE})"],
     )
-    private var gridSize: Int = DEFAULT_GRID_SIZE
+    private var gridSize: Int = Universe.DEFAULT_GRID_SIZE
 
     override fun call(): Int {
         val universe = Universe.create(gridSize = gridSize)
@@ -67,7 +67,6 @@ class GameOfLifeCommand(
 
     companion object {
         private const val DELAY_BETWEEN_GENERATIONS_IN_MS = 200L
-        private const val DEFAULT_GRID_SIZE = 64
 
         @JvmStatic fun main(args: Array<String>) {
             val exitCode = PicocliRunner.call(GameOfLifeCommand::class.java, *args)
