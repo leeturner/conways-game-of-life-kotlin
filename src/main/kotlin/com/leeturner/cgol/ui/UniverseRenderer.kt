@@ -25,16 +25,7 @@ class SimpleTerminalUniverseRenderer(
                 // Clear to end of line so a shorter header doesn't leave stale digits behind
                 appendLine("Generation: $generation | Population: ${universe.population()}\u001b[K")
                 appendLine()
-                for (y in 0..<universe.gridSize) {
-                    for (x in 0..<universe.gridSize) {
-                        if (universe.isAlive(x, y)) {
-                            append(aliveCell)
-                        } else {
-                            append(deadCell)
-                        }
-                    }
-                    appendLine()
-                }
+                appendLine(universe.toGridString(aliveCell, deadCell))
             }
         print(frame)
         System.out.flush()

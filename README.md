@@ -102,8 +102,7 @@ src/
 ├── main/kotlin/com/leeturner/cgol/
 │   ├── GameOfLifeCommand.kt         # CLI entry point and simulation runner
 │   ├── engine/
-│   │   ├── Universe.kt              # Core game logic and rules
-│   │   └── UniverseFactory.kt       # Factory for creating universes
+│   │   └── Universe.kt              # Core game logic and rules
 │   └── ui/
 │       └── UniverseRenderer.kt      # Terminal rendering with ANSI colors
 └── test/kotlin/com/leeturner/cgol/

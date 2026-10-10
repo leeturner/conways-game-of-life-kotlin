@@ -2,7 +2,6 @@ package com.leeturner.cgol
 
 import com.leeturner.cgol.engine.Universe
 import com.leeturner.cgol.engine.UniverseCoordinatesOutOfBoundsError
-import com.leeturner.cgol.engine.UniverseFactory
 import com.leeturner.cgol.engine.UniverseMinimumSizeError
 import com.leeturner.cgol.engine.UniverseNoAliveCells
 import com.leeturner.cgol.ui.UniverseRenderer
@@ -19,17 +18,16 @@ import kotlin.system.exitProcess
     mixinStandardHelpOptions = true,
 )
 class GameOfLifeCommand(
-    @Inject private val universeFactory: UniverseFactory,
     @Inject private val universeRenderer: UniverseRenderer,
 ) : Callable<Int> {
     @Option(
         names = ["-g", "--grid-size"],
-        description = ["The size of the grid (default: ${DEFAULT_GRID_SIZE}x${ DEFAULT_GRID_SIZE })"],
+        description = ["The size of the grid (default: ${Universe.DEFAULT_GRID_SIZE}x${Universe.DEFAULT_GRID_SIZE})"],
     )
-    private var gridSize: Int = DEFAULT_GRID_SIZE
+    private var gridSize: Int = Universe.DEFAULT_GRID_SIZE
 
     override fun call(): Int {
-        val universe = universeFactory.universeCreator().create(gridSize = gridSize)
+        val universe = Universe.create(gridSize = gridSize)
         universe.fold(
             ifLeft = { error ->
                 println("Error creating universe:")
@@ -69,7 +67,6 @@ class GameOfLifeCommand(
 
     companion object {
         private const val DELAY_BETWEEN_GENERATIONS_IN_MS = 200L
-        private const val DEFAULT_GRID_SIZE = 64
 
         @JvmStatic fun main(args: Array<String>) {
             val exitCode = PicocliRunner.call(GameOfLifeCommand::class.java, *args)

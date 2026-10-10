@@ -3,7 +3,6 @@ package com.leeturner.cgol.engine
 import arrow.core.Either
 import arrow.core.raise.either
 import arrow.core.raise.ensure
-import arrow.core.right
 import kotlin.random.Random
 
 /**
@@ -18,8 +17,8 @@ import kotlin.random.Random
  */
 @ConsistentCopyVisibility
 data class Universe internal constructor(
-    val gridSize: Int = 64,
-    private val aliveCells: Set<Coordinate> = emptySet(),
+    val gridSize: Int,
+    private val aliveCells: Set<Coordinate>,
 ) {
     fun isAlive(coordinate: Coordinate) = coordinate in aliveCells
 
@@ -41,37 +40,23 @@ data class Universe internal constructor(
      * Any live cell with two or three live neighbours lives on to the next generation.
      *
      * Optimized implementation: Instead of checking all gridSize x gridSize cells,
-     * we only check alive cells (for survival) and their neighbors (for potential births).
-     * This is much more efficient for sparse populations.
+     * each alive cell adds one to the count of each of its neighbours. Only cells with
+     * at least one live neighbour get a count, so they are the only ones that can be
+     * alive next generation. This is much more efficient for sparse populations.
      */
-    fun tick(): Universe {
-        // Build set of all cells that need checking: alive cells + their neighbors
-        val cellsToCheck =
-            buildSet {
-                aliveCells.forEach { cell ->
-                    add(cell) // Check if alive cell survives
-                    addAll(neighbors(cell)) // Check if dead neighbors are born
-                }
-            }
-
-        val newAliveCells =
-            cellsToCheck
-                .filter { coordinate ->
-                    val liveNeighbourCount = neighbors(coordinate).count { isAlive(it) }
-                    when {
-                        isAlive(coordinate) -> liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX
-                        else -> liveNeighbourCount == BIRTH_COUNT
-                    }
-                }.toSet()
-
-        return copy(aliveCells = newAliveCells)
-    }
-
-    private val allCoordinates: Sequence<Coordinate>
-        get() =
-            (0..<gridSize).asSequence().flatMap { y ->
-                (0..<gridSize).map { x -> Coordinate(x, y) }
-            }
+    fun tick(): Universe =
+        copy(
+            aliveCells =
+                aliveCells
+                    .flatMap(::neighbors)
+                    .groupingBy { it }
+                    .eachCount()
+                    .filter { (cell, liveNeighbourCount) ->
+                        // Three live neighbours means alive next generation, whether by birth or survival
+                        liveNeighbourCount == BIRTH_COUNT ||
+                            (isAlive(cell) && liveNeighbourCount in SURVIVAL_MIN..SURVIVAL_MAX)
+                    }.keys,
+        )
 
     /**
      * We implement a Toroidal (wrapping) universe - The grid wraps around like a torus.
@@ -96,18 +81,24 @@ data class Universe internal constructor(
             }
         }
 
-    override fun toString(): String =
-        allCoordinates
-            .chunked(gridSize)
-            .joinToString("\n") { row ->
-                row.joinToString("") { coord ->
-                    if (isAlive(coord)) " #" else " ·"
-                }
+    /**
+     * Draws the grid one row per line, using [aliveCell] and [deadCell] for each cell.
+     */
+    fun toGridString(
+        aliveCell: String,
+        deadCell: String,
+    ): String =
+        (0..<gridSize).joinToString("\n") { y ->
+            (0..<gridSize).joinToString("") { x ->
+                if (isAlive(x, y)) aliveCell else deadCell
             }
+        }
+
+    override fun toString(): String = toGridString(aliveCell = " #", deadCell = " ·")
 
     companion object {
         fun create(
-            gridSize: Int = 64,
+            gridSize: Int = DEFAULT_GRID_SIZE,
             aliveCells: Set<Coordinate> = randomAliveCells(gridSize),
         ): Either<UniverseCreationError, Universe> =
             either {
@@ -122,7 +113,7 @@ data class Universe internal constructor(
                 ensure(outOfBoundCoordinates.isEmpty()) {
                     UniverseCoordinatesOutOfBoundsError(outOfBoundCoordinates)
                 }
-                return Universe(gridSize, aliveCells).right()
+                Universe(gridSize, aliveCells)
             }
 
         /**
@@ -141,6 +132,7 @@ data class Universe internal constructor(
                     }.toSet()
             }.first { it.isNotEmpty() || gridSize < 1 }
 
+        const val DEFAULT_GRID_SIZE = 64
         private const val MINIMUM_GRID_SIZE = 3
         private const val SURVIVAL_MIN = 2 // Minimum neighbors for survival
         private const val SURVIVAL_MAX = 3 // Maximum neighbors for survival

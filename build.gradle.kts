@@ -17,19 +17,14 @@ repositories {
 
 dependencies {
   kapt(libs.picocli.codegen)
-  kapt(libs.micronaut.serde.processor)
 
   implementation(libs.picocli)
-  implementation(libs.micronaut.kotlin.extension.functions)
   implementation(libs.micronaut.kotlin.runtime)
   implementation(libs.micronaut.picocli)
-  implementation(libs.kotlin.reflect)
-  implementation(libs.kotlin.stdlib.jdk8)
   implementation(libs.arrow.core)
 
   runtimeOnly(libs.logback.classic)
 
-  testImplementation(libs.junit.platform.suite)
   testImplementation(libs.strikt.core)
   testImplementation(libs.strikt.arrow)
 }
