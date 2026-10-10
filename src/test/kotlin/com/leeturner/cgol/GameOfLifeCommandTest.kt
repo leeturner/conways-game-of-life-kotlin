@@ -15,10 +15,16 @@ class GameOfLifeCommandTest {
     fun `the grid size parameter is passed into universe creation to return an error`() {
         ApplicationContext.run(Environment.CLI, Environment.TEST).use { ctx ->
             ByteArrayOutputStream().use { baos ->
+                val originalOut = System.out
                 System.setOut(PrintStream(baos))
 
                 val args = arrayOf("-g", "2")
-                val exitCode = PicocliRunner.call(GameOfLifeCommand::class.java, ctx, *args)
+                val exitCode =
+                    try {
+                        PicocliRunner.call(GameOfLifeCommand::class.java, ctx, *args)
+                    } finally {
+                        System.setOut(originalOut)
+                    }
 
                 expectThat(exitCode).isEqualTo(1)
                 expectThat(baos.toString()).contains("Error creating universe:")
