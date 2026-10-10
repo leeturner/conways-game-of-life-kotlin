@@ -30,20 +30,36 @@ dependencies {
   testImplementation(libs.strikt.arrow)
 }
 
+// KorGE's AWT/OpenGL window reflects into JDK internals and loads native code.
+// Same package list as KorGE's jvmAddOpensList(); the platform packages only exist on their own OS.
+val korgeCommonPackages = listOf("sun.java2d.opengl", "java.awt", "sun.awt")
+val korgeMacPackages = listOf("sun.lwawt", "sun.lwawt.macosx", "com.apple.eawt", "com.apple.eawt.event")
+val korgeLinuxPackages = listOf("sun.awt.X11")
+
 application {
     mainClass = "com.leeturner.cgol.GameOfLifeCommand"
-    // KorGE's AWT/OpenGL window reflects into JDK internals and loads native code.
-    // Same package list as KorGE's jvmAddOpensList(); the platform packages only exist on their own OS.
+    // Command-line flags warn about packages missing on this OS, so only pass this OS's ones
     val os = System.getProperty("os.name").lowercase()
     val platformPackages =
         when {
-            "mac" in os -> listOf("sun.lwawt", "sun.lwawt.macosx", "com.apple.eawt", "com.apple.eawt.event")
-            "linux" in os -> listOf("sun.awt.X11")
+            "mac" in os -> korgeMacPackages
+            "linux" in os -> korgeLinuxPackages
             else -> emptyList()
         }
     applicationDefaultJvmArgs =
-        (listOf("sun.java2d.opengl", "java.awt", "sun.awt") + platformPackages)
+        (korgeCommonPackages + platformPackages)
             .map { "--add-opens=java.desktop/$it=ALL-UNNAMED" } + "--enable-native-access=ALL-UNNAMED"
+}
+
+// So `java -jar golk-all.jar -r korge` works without flags; the manifest quietly skips packages this OS lacks
+tasks.shadowJar {
+    manifest {
+        attributes(
+            "Add-Opens" to
+                (korgeCommonPackages + korgeMacPackages + korgeLinuxPackages).joinToString(" ") { "java.desktop/$it" },
+            "Enable-Native-Access" to "ALL-UNNAMED",
+        )
+    }
 }
 
 java {
