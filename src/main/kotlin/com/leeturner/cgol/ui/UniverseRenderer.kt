@@ -18,10 +18,12 @@ class SimpleTerminalUniverseRenderer(
 
         print("\u001b[?25l") // Hide cursor
 
+        if (generation == 0) print("\u001b[2J") // Clear existing terminal content before the first frame
         moveCursorHome()
         val frame =
             buildString {
-                appendLine("Generation: $generation | Population: ${universe.population()}")
+                // Clear to end of line so a shorter header doesn't leave stale digits behind
+                appendLine("Generation: $generation | Population: ${universe.population()}\u001b[K")
                 appendLine()
                 for (y in 0..<universe.gridSize) {
                     for (x in 0..<universe.gridSize) {
