@@ -2,7 +2,6 @@ package com.leeturner.cgol
 
 import com.leeturner.cgol.engine.Universe
 import com.leeturner.cgol.engine.UniverseCoordinatesOutOfBoundsError
-import com.leeturner.cgol.engine.UniverseFactory
 import com.leeturner.cgol.engine.UniverseMinimumSizeError
 import com.leeturner.cgol.engine.UniverseNoAliveCells
 import com.leeturner.cgol.ui.UniverseRenderer
@@ -19,7 +18,6 @@ import kotlin.system.exitProcess
     mixinStandardHelpOptions = true,
 )
 class GameOfLifeCommand(
-    @Inject private val universeFactory: UniverseFactory,
     @Inject private val universeRenderer: UniverseRenderer,
 ) : Callable<Int> {
     @Option(
@@ -29,7 +27,7 @@ class GameOfLifeCommand(
     private var gridSize: Int = DEFAULT_GRID_SIZE
 
     override fun call(): Int {
-        val universe = universeFactory.universeCreator().create(gridSize = gridSize)
+        val universe = Universe.create(gridSize = gridSize)
         universe.fold(
             ifLeft = { error ->
                 println("Error creating universe:")
