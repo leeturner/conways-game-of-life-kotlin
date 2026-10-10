@@ -2,6 +2,7 @@ package com.leeturner.cgol
 
 import com.leeturner.cgol.engine.Universe
 import com.leeturner.cgol.engine.UniverseCoordinatesOutOfBoundsError
+import com.leeturner.cgol.engine.UniverseMaximumSizeError
 import com.leeturner.cgol.engine.UniverseMinimumSizeError
 import com.leeturner.cgol.engine.UniverseNoAliveCells
 import com.leeturner.cgol.ui.UniverseRenderer
@@ -42,6 +43,10 @@ class GameOfLifeCommand(
                         println("The minimum grid size is ${error.minimumGridSize}")
                     }
 
+                    is UniverseMaximumSizeError -> {
+                        println("The maximum grid size is ${error.maximumGridSize}")
+                    }
+
                     is UniverseNoAliveCells -> {
                         println("There are no alive cells in the initial state")
                     }
@@ -61,6 +66,10 @@ class GameOfLifeCommand(
             universe.tick() to generation + 1
         }.forEach { (universe, generation) ->
             universeRenderer.render(universe, generation)
+            if (universe.population() == 0) {
+                println("All cells died at generation $generation")
+                return
+            }
             Thread.sleep(DELAY_BETWEEN_GENERATIONS_IN_MS)
         }
     }
