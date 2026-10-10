@@ -61,6 +61,10 @@ class GameOfLifeCommand(
             universe.tick() to generation + 1
         }.forEach { (universe, generation) ->
             universeRenderer.render(universe, generation)
+            if (universe.population() == 0) {
+                println("All cells died at generation $generation")
+                return
+            }
             Thread.sleep(DELAY_BETWEEN_GENERATIONS_IN_MS)
         }
     }
