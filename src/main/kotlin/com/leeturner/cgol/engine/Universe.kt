@@ -58,12 +58,6 @@ data class Universe internal constructor(
                     }.keys,
         )
 
-    private val allCoordinates: Sequence<Coordinate>
-        get() =
-            (0..<gridSize).asSequence().flatMap { y ->
-                (0..<gridSize).map { x -> Coordinate(x, y) }
-            }
-
     /**
      * We implement a Toroidal (wrapping) universe - The grid wraps around like a torus.
      * A cell at (0,0) would have neighbors wrapping to the opposite edges.
@@ -87,14 +81,20 @@ data class Universe internal constructor(
             }
         }
 
-    override fun toString(): String =
-        allCoordinates
-            .chunked(gridSize)
-            .joinToString("\n") { row ->
-                row.joinToString("") { coord ->
-                    if (isAlive(coord)) " #" else " ·"
-                }
+    /**
+     * Draws the grid one row per line, using [aliveCell] and [deadCell] for each cell.
+     */
+    fun toGridString(
+        aliveCell: String,
+        deadCell: String,
+    ): String =
+        (0..<gridSize).joinToString("\n") { y ->
+            (0..<gridSize).joinToString("") { x ->
+                if (isAlive(x, y)) aliveCell else deadCell
             }
+        }
+
+    override fun toString(): String = toGridString(aliveCell = " #", deadCell = " ·")
 
     companion object {
         fun create(
