@@ -1,190 +1,92 @@
-# Conway's Game of Life – Kotlin
+# Conway's Game of Life
 
-A terminal-based implementation of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
-written in Kotlin, using the Micronaut framework and functional programming with Arrow.
+[![Build](https://github.com/leeturner/conways-game-of-life-kotlin/actions/workflows/build.yml/badge.svg)](https://github.com/leeturner/conways-game-of-life-kotlin/actions/workflows/build.yml)
+[![Licence](https://img.shields.io/github/license/leeturner/conways-game-of-life-kotlin)](LICENSE)
 
-## Overview
+[Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) in the terminal, written in Kotlin
+with Micronaut and functional programming with [Arrow](https://arrow-kt.io/). Watch generations of cells evolve in
+colour in your terminal, or in a [KorGE](https://korge.org/) 2D window.
 
-This project implements the classic cellular automaton devised by mathematician John Conway. The simulation runs
-in your terminal with colorized output, displaying generations of cells evolving, according to simple rules that
-create complex and fascinating patterns.
+![The Game of Life running in the terminal](docs/cgolk.gif "The Game of Life in the terminal")
 
-### Features
+![The Game of Life in a KorGE window](docs/korge.png "The Game of Life in a KorGE window")
 
-- **Toroidal Universe**: The grid wraps around like a torus - cells at edges interact with cells on opposite edges
-- **Optimized Algorithm**: Only checks alive cells and their neighbors instead of the entire grid for better performance
-- **Terminal Rendering**: Real-time visualization in your terminal with ANSI color support
-- **KorGE Window Rendering**: Optionally draw the universe in a [KorGE](https://korge.org/) 2D window with `--renderer korge`
-- **Configurable Grid Size**: Customize the universe dimensions with command-line options
-- **Random Initial State**: Generates random starting configurations for exploration
-- **Functional Error Handling**: Uses Arrow's `Either` type for robust error handling
+## Features
 
-## The Rules
+- A toroidal universe: the grid wraps around, so cells on one edge are neighbours of cells on the opposite edge
+- Only live cells and their neighbours are checked each generation, not the whole grid
+- Drawn in the terminal with ANSI colours, or in a KorGE window with `--renderer korge`
+- Grid sizes from 3 to 256, with a random starting pattern each time
+- Errors handled with Arrow's `Either`
 
-Conway's Game of Life follows four simple rules:
+## The rules
 
-1. **Underpopulation**: Any live cell with fewer than two live neighbours dies
-2. **Survival**: Any live cell with two or three live neighbours lives on to the next generation
-3. **Overpopulation**: Any live cell with more than three live neighbours dies
-4. **Reproduction**: Any dead cell with exactly three live neighbours becomes a live cell
-
-## Screenshots
-
-![Animated GIF of GOL](/docs/cgolk.gif "Animated Terminal GOL")
-
-![Screenshot of the KorGE window](/docs/korge.png "KorGE Window GOL")
-
-## Technology Stack
-
-- **Language**: Kotlin with JVM 25
-- **Framework**: Micronaut (for dependency injection and CLI)
-- **CLI**: Picocli (command-line interface)
-- **Functional Programming**: Arrow Core (for Either, functional error handling)
-- **Build Tool**: Gradle with Kotlin DSL
-- **Testing**: JUnit 5 with Strikt assertions
-- **Code Quality**: Detekt (static analysis) and Kotlinter (formatting)
+1. **Underpopulation:** any live cell with fewer than two live neighbours dies.
+2. **Survival:** any live cell with two or three live neighbours lives on to the next generation.
+3. **Overpopulation:** any live cell with more than three live neighbours dies.
+4. **Reproduction:** any dead cell with exactly three live neighbours becomes a live cell.
 
 ## Requirements
 
-- Java 25 or higher
-- Gradle (wrapper included)
+- Java 25 or later
 
-## Building
+## Usage
 
-Build the project using the Gradle wrapper:
-
-```bash
-./gradlew build
-```
-
-This will:
-- Compile the Kotlin source code
-- Run all tests
-- Run code quality checks (Detekt, Kotlinter)
-- Create executable distributions
-
-## Running
-
-### Using Gradle
-
-Run with default settings (64x64 grid):
+Run it with Gradle, with the default 64 by 64 grid:
 
 ```bash
 ./gradlew run
 ```
 
-Run with custom grid size:
-
-```bash
-./gradlew run --args="--grid-size 32"
-```
-
-Run in a KorGE 2D window instead of the terminal:
-
-```bash
-./gradlew run --args="--renderer korge"
-```
-
-### Using the Distribution
-
-After building, you can run the standalone application:
-
-```bash
-./build/distributions/golk/bin/golk
-```
-
 Or with options:
 
 ```bash
-./build/distributions/golk/bin/golk --grid-size 100
+./gradlew run --args="--grid-size 32"
+./gradlew run --args="--renderer korge"
 ```
 
-### Command-Line Options
+| Option | Meaning |
+|---|---|
+| `-g, --grid-size <size>` | The grid size, from 3 to 256 (default: 64) |
+| `-r, --renderer <terminal\|korge>` | Draw in the terminal or a KorGE window (default: terminal) |
+| `-h, --help` | Show help and exit |
 
-- `-g, --grid-size <size>`: Set the grid size, from 3 to 256 (default: 64)
-- `-r, --renderer <terminal|korge>`: Draw in the terminal or a KorGE window (default: terminal)
-- `-h, --help`: Show help message and exit
+To run it without Gradle, install it and use the `golk` command:
 
-## Project Structure
-
-```
-src/
-├── main/kotlin/com/leeturner/cgol/
-│   ├── GameOfLifeCommand.kt         # CLI entry point and simulation runner
-│   ├── engine/
-│   │   └── Universe.kt              # Core game logic and rules
-│   └── ui/
-│       └── UniverseRenderer.kt      # Terminal rendering with ANSI colors
-└── test/kotlin/com/leeturner/cgol/
-    └── engine/
-        ├── UniverseCreationTests.kt # Tests for universe validation
-        └── UniverseRulesTests.kt    # Tests for Conway's rules and patterns
+```bash
+./gradlew installDist
+./build/install/golk/bin/golk --grid-size 100
 ```
 
 ## Configuration
 
 The application can be configured via `src/main/resources/application.properties`:
 
-- `universe.renderer.alive-cell-color`: ANSI color code for alive cells (default: green)
-- `universe.renderer.dead-cell-color`: ANSI color code for dead cells (default: gray)
+- `universe.renderer.alive-cell-color`: ANSI colour code for alive cells (default: green)
+- `universe.renderer.dead-cell-color`: ANSI colour code for dead cells (default: grey)
 
-Available ANSI color codes:
+Available ANSI colour codes:
 - `\u001b[31m` - Red
 - `\u001b[32m` - Green
 - `\u001b[33m` - Yellow
 - `\u001b[34m` - Blue
 - `\u001b[35m` - Magenta
 - `\u001b[36m` - Cyan
-- `\u001b[90m` - Gray
+- `\u001b[90m` - Grey
 - `\u001b[91m` - Bright Red
 - `\u001b[92m` - Bright Green
 - `\u001b[94m` - Bright Blue
 
-## Testing
+## How it works
 
-Run all tests:
-
-```bash
-./gradlew test
-```
-
-The test suite includes:
-- **Rules Tests**: Verification of all four Conway's Game of Life rules
-- **Toroidal Universe Tests**: Ensures proper wrapping behavior at grid edges
-- **Still Life Patterns**: Tests for stable patterns (block, bee-hive, tub)
-- **Oscillator Patterns**: Tests for repeating patterns (blinker, toad, beacon)
-- **Universe Creation**: Validation tests for grid size, coordinates, and initial state
-
-## Code Quality
-
-Run static analysis with Detekt:
-
-```bash
-./gradlew detekt
-```
-
-Check code formatting with Kotlinter:
-
-```bash
-./gradlew lintKotlin
-```
-
-Auto-format code:
-
-```bash
-./gradlew formatKotlin
-```
-
-## Implementation Details
-
-### Universe Representation
+### The universe
 
 The universe is represented as a `Set<Coordinate>` containing only alive cells. This sparse representation:
 - Reduces memory usage for typical Game of Life patterns
 - Speeds up the tick algorithm by avoiding checks of empty space
 - Allows for efficient lookup of cell states
 
-### Tick Algorithm Optimization
+### Each tick
 
 Instead of checking all `gridSize × gridSize` cells each generation, the algorithm:
 1. Collects all alive cells
@@ -192,27 +94,21 @@ Instead of checking all `gridSize × gridSize` cells each generation, the algori
 3. Only evaluates rules for this combined set
 4. Typically processes far fewer cells than the full grid
 
-This optimization is particularly effective for sparse populations, which are common in Conway's Game of Life.
+This is particularly effective for sparse populations, which are common in Conway's Game of Life.
 
-### Error Handling
+### Errors
 
 The project uses functional error handling with Arrow's `Either` type:
 - `UniverseMinimumSizeError`: Grid size must be at least 3×3
 - `UniverseCoordinatesOutOfBoundsError`: Initial cells must be within grid bounds
 - `UniverseNoAliveCells`: Universe must have at least one alive cell
 
-## CI/CD
+## Building
 
-The project includes GitHub Actions workflows:
-- **Build Workflow**: Compiles and tests on every push/PR to main
-- **Dependabot**: Automated dependency updates and security alerts
+`./gradlew build` compiles the code and runs the tests, Detekt and Kotlinter. The tests cover the four rules, wrapping
+at the edges of the universe, still lifes (block, beehive, tub) and oscillators (blinker, toad, beacon). To fix
+formatting, run `./gradlew formatKotlin`.
 
-## License
+## Licence
 
-This is a personal project for educational purposes.
-
-## Author
-
-Created by Lee Turner
-
-
+Apache 2.0. See [LICENSE](LICENSE).
