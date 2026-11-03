@@ -18,6 +18,8 @@ strikt = "0.35.1"
 arrow = "2.3.0.1"
 arrow-detekt-rules = "0.2.0"
 korge = "6.0.0"
+# Override for Micronaut platform 5.2.4 (pins 2.22.2, vulnerable). Remove once the platform manages >= 2.22.3.
+jackson = "2.22.4"
 
 [libraries]
 
@@ -40,6 +42,9 @@ arrow-detekt-rules = { module = "io.github.leeturner:arrow-detekt-rules", versio
 
 # KorGE
 korge = { module = "com.soywiz.korge:korge-jvm", version.ref = "korge" }
+
+# Jackson (pulled in by KorGE)
+jackson-bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 
 # Testing
 strikt-core = { module = "io.strikt:strikt-core", version.ref = "strikt" }

@@ -23,6 +23,7 @@ dependencies {
   implementation(libs.micronaut.picocli)
   implementation(libs.arrow.core)
   implementation(libs.korge)
+  implementation(platform(libs.jackson.bom))
 
   runtimeOnly(libs.logback.classic)
 
