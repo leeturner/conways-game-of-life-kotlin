@@ -16,6 +16,7 @@ shadow = "9.6.1"
 # Libraries
 strikt = "0.35.1"
 arrow = "2.3.0.1"
+arrow-detekt-rules = "0.2.0"
 korge = "6.0.0"
 
 [libraries]
@@ -33,6 +34,9 @@ picocli-codegen = { module = "info.picocli:picocli-codegen" }
 
 # Arrow
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
+
+# Detekt plugins
+arrow-detekt-rules = { module = "io.github.leeturner:arrow-detekt-rules", version.ref = "arrow-detekt-rules" }
 
 # KorGE
 korge = { module = "com.soywiz.korge:korge-jvm", version.ref = "korge" }

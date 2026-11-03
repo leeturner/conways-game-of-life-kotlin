@@ -28,6 +28,8 @@ dependencies {
 
   testImplementation(libs.strikt.core)
   testImplementation(libs.strikt.arrow)
+
+  detektPlugins(libs.arrow.detekt.rules)
 }
 
 // KorGE's AWT/OpenGL window reflects into JDK internals and loads native code.
@@ -77,6 +79,9 @@ detekt {
   config.setFrom(file("config/detekt/detekt.yml"))
   buildUponDefaultConfig = true
 }
+
+// The Arrow rules need type resolution, which plain `detekt` doesn't have
+tasks.check { dependsOn(tasks.detektMain, tasks.detektTest) }
 
 micronaut {
     version(libs.versions.micronaut.version.get())

@@ -5,3 +5,6 @@ performance:
 style:
   ForbiddenComment:
     active: false
+  VarCouldBeVal:
+    # picocli sets @Option fields by reflection
+    ignoreAnnotated: ['Option']
