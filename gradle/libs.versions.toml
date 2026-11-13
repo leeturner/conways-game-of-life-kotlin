@@ -5,7 +5,7 @@ kotlin = "2.4.21"
 kapt = "2.4.21"
 
 # Micronaut
-micronaut-version = "5.2.4"
+micronaut-version = "5.2.6"
 micronaut-application = "5.0.2"
 
 # Plugins
@@ -18,7 +18,7 @@ strikt = "0.35.1"
 arrow = "2.3.0.1"
 arrow-detekt-rules = "0.3.0"
 korge = "6.0.0"
-# Override for Micronaut platform 5.2.4 (pins 2.22.2, vulnerable). Remove once the platform manages >= 2.22.3.
+# Override for Micronaut platform 5.2.6 (pins 2.22.2 via micronaut-pulsar-bom, vulnerable). Remove once the platform manages >= 2.22.3.
 jackson = "2.23.0"
 
 [libraries]
